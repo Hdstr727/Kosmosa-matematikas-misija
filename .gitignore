@@ -16,3 +16,5 @@ ENV/
 .vscode/
 .idea/
 .DS_Store
+pack_project.py
+project_context.txt
