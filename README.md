@@ -11,7 +11,7 @@ Izglītojoša 2D datorspēle Python vidē, kas apvieno kosmosa kuģa vadīšanas
 
 ## 🌌 Projekta ideja un mērķis
 
-Spēlētājs vada kosmosa kuģi, kas automātiski pārvietojas uz augšu cauri asteroīdu joslām (kosmosa fons slīd uz leju). Lai veiksmīgi sasniegtu galamērķi — zaļo finiša līniju līmeņa augšdaļā —, spēlētājam ar bultiņām jāvada kuģis pa labi/kreiski, jāizvairās no sadursmēm ar asteroīdiem, jāvāc resursi un regulāri jāatrisina matemātiskie uzdevumi, kas uz laiku aptur spēles laika tecējumu.
+Spēlētājs vada kosmosa kuģi, kas automātiski pārvietojas uz augšu cauri asteroīdu joslām (kosmosa fons slīd uz leju). Lai veiksmīgi sasniegtu galamērķi - zaļo finiša līniju līmeņa augšdaļā -, spēlētājam ar bultiņām jāvada kuģis pa labi/kreiski, jāizvairās no sadursmēm ar asteroīdiem, jāvāc resursi un regulāri jāatrisina matemātiskie uzdevumi, kas uz laiku aptur spēles laika tecējumu.
 
 **Mērķis:** Veicināt matemātikas prasmes pamatskolas un vidusskolas skolēniem vecumā no 10 līdz 17 gadiem caur spēles elementiem, piedāvājot tūlītēju vizuālo un skaitlisko atgriezenisko saiti, kā arī adaptīvu, līmeņos strukturētu grūtības progresu.
 
@@ -33,7 +33,7 @@ Spēlētājs vada kosmosa kuģi, kas automātiski pārvietojas uz augšu cauri a
    * **Progresa skala:** Labajā pusē izvietotais vertikālais indikators reāllaikā attēlo kuģa attālumu līdz finiša līnijai.
 
 4. **Īpašie mehānismi:**
-   * **Dzinēja kļūme (Breakdown):** Pēkšņi rodas tehnisks bojājums. Pareiza atbilde aktivizē degvielas taupīšanas režīmu uz 4.5 sekundēm, nepareiza — atņem 20 degvielas vienības un piešķir sodu (Strike).
+   * **Dzinēja kļūme (Breakdown):** Pēkšņi rodas tehnisks bojājums. Pareiza atbilde aktivizē degvielas taupīšanas režīmu uz 4.5 sekundēm, nepareiza - atņem 20 degvielas vienības un piešķir sodu (Strike).
    * **Pēdējā iespēja (Last Chance):** Kad degviela nokrītas līdz 0, spēle tiek pauzēta un spēlētājam tiek dots viens mēģinājums atrisināt grūtāku uzdevumu, lai saņemtu 50 degvielas vienības. Ja uzdevums netiek atrisināts, iestājas zaudējums.
 
 5. **Efekti un partikulas:**
@@ -50,19 +50,19 @@ Spēlētājs vada kosmosa kuģi, kas automātiski pārvietojas uz augšu cauri a
 
 Projekta struktūra ir modularizēta, nodrošinot augstu koda lasāmību un vieglu uzturēšanu:
 
-* `main.py` — Programmas ieejas punkts. Satur galveno `Game` klasi, kas darbojas kā stāvokļu mašīna (`MainMenu`, `LevelSelect`, `Gameplay`, `ResultScreen`).
-* `gameplay.py` — Vada vienas spēles sesijas loģiku, reāllaika laika atskaiti, objektu sadursmes un spēles pauzēšanu uzdevumu laikā.
-* `background.py` — Atbild par kosmosa fona un parallax zvaigžņu slāņu renderēšanu.
-* `particles.py` — Realizē vizuālo daļiņu izveides un dzīves cikla apstrādi.
-* `math_tasks.py` — Matemātikas uzdevumu ģenerators ar 5 grūtības pakāpēm (no aritmētikas līdz vienādojumiem un procentiem).
-* `level_config.py` — Glabā un padod līmeņu parametru konfigurācijas.
-* `game_state.py` — Nodrošina progresu datu saglabāšanu JSON failā.
-* `ui.py` — Satur lietotāja saskarnes komponentus (Pogas, HUD, uznirstošo uzdevumu logu `TaskPopup`).
-* `entities/` — Spēles fizisko objektu pakotne:
-  * `base_entity.py` — Abstraktā bāzes klase `BaseEntity` (manto no `abc.ABC`).
-  * `ship.py` — Spēlētāja kuģis (kustība, vizuālais dizains, dzinēju dūmu izvade).
-  * `asteroid.py` — Asteroīdi ar neregulāru formu, rotācijas fiziku un krāteriem.
-  * `pickup.py` — Resursu vākšanas objekti (`HealthPickup` un `FuelPickup`).
+* `main.py` - Programmas ieejas punkts. Satur galveno `Game` klasi, kas darbojas kā stāvokļu mašīna (`MainMenu`, `LevelSelect`, `Gameplay`, `ResultScreen`).
+* `gameplay.py` - Vada vienas spēles sesijas loģiku, reāllaika laika atskaiti, objektu sadursmes un spēles pauzēšanu uzdevumu laikā.
+* `background.py` - Atbild par kosmosa fona un parallax zvaigžņu slāņu renderēšanu.
+* `particles.py` - Realizē vizuālo daļiņu izveides un dzīves cikla apstrādi.
+* `math_tasks.py` - Matemātikas uzdevumu ģenerators ar 5 grūtības pakāpēm (no aritmētikas līdz vienādojumiem un procentiem).
+* `level_config.py` - Glabā un padod līmeņu parametru konfigurācijas.
+* `game_state.py` - Nodrošina progresu datu saglabāšanu JSON failā.
+* `ui.py` - Satur lietotāja saskarnes komponentus (Pogas, HUD, uznirstošo uzdevumu logu `TaskPopup`).
+* `entities/` - Spēles fizisko objektu pakotne:
+  * `base_entity.py` - Abstraktā bāzes klase `BaseEntity` (manto no `abc.ABC`).
+  * `ship.py` - Spēlētāja kuģis (kustība, vizuālais dizains, dzinēju dūmu izvade).
+  * `asteroid.py` - Asteroīdi ar neregulāru formu, rotācijas fiziku un krāteriem.
+  * `pickup.py` - Resursu vākšanas objekti (`HealthPickup` un `FuelPickup`).
 
 ---
 
@@ -97,7 +97,7 @@ Kods izmanto daudzlīmeņu mantošanas hierarhiju, tādējādi izvairoties no ko
                            /        \
              [ HealthPickup ]      [ FuelPickup ]
 ```
-Klasēs `HealthPickup` un `FuelPickup` kopīgā peldēšanas animācijas un pozicionēšanas loģika ir mantota no vecāka klases `Pickup`, bet specifiskā iedarbība — no abstraktās metodes `apply()`.
+Klasēs `HealthPickup` un `FuelPickup` kopīgā peldēšanas animācijas un pozicionēšanas loģika ir mantota no vecāka klases `Pickup`, bet specifiskā iedarbība - no abstraktās metodes `apply()`.
 
 ### 3. Iekapsulēšana un datu slēpšana (Encapsulation)
 Visas objektu iekšējās mainīgo vērtības (piemēram, veselība, ātrums, pozīcija) ir aizsargātas, izmantojot vienas pasvītras `_` (protected) un dubultās pasvītras `__` (private) konvenciju. Piekļuve šiem datiem un to modifikācija no ārpuses ir iespējama tikai caur publiskajām metodēm vai `@property` dekoratoriem, kas veic datu validāciju:
@@ -145,8 +145,8 @@ for ast in self._asteroids:
    ```
 
 ### Vadība spēles laikā:
-* **Bultiņa pa kreisi / pa labi** — kuģa pārvietošana horizontāli.
-* **[ENTER]** — apstiprināt atbildi matemātikas uzdevuma logā.
-* **[BACKSPACE]** — dzēst pēdējo ievadīto ciparu/simbolu.
-* **[E]** — aktivizēt ārkārtas degvielas uzdevumu (kad kuģim beidzas degviela).
-* **[F11]** — pārslēgt pilnekrāna (Fullscreen) režīmu.
+* **Bultiņa pa kreisi / pa labi** - kuģa pārvietošana horizontāli.
+* **[ENTER]** - apstiprināt atbildi matemātikas uzdevuma logā.
+* **[BACKSPACE]** - dzēst pēdējo ievadīto ciparu/simbolu.
+* **[E]** - aktivizēt ārkārtas degvielas uzdevumu (kad kuģim beidzas degviela).
+* **[F11]** - pārslēgt pilnekrāna (Fullscreen) režīmu.
