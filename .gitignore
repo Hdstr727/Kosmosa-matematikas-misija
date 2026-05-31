@@ -1,0 +1,18 @@
+# Python bytecode (compiled files)
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Game save data (local progress)
+save_data.json
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# IDE and OS specific files (VS Code, PyCharm, macOS)
+.vscode/
+.idea/
+.DS_Store
