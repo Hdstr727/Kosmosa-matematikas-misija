@@ -154,7 +154,7 @@ class HUD:
         pygame.draw.rect(surface, color, pygame.Rect(icon_x - 10, icon_y - 8, 20, 18), border_radius=3)
         pygame.draw.rect(surface, color, (icon_x - 5, icon_y - 13, 10, 6), border_radius=2)
         for i, line in enumerate(TXT_EMERG_FUEL.split("\n")):
-            draw_text(surface, line, 12, color, x + 27, y + 58 + i * 14, anchor="center")
+            draw_text(surface, line, 11, color, x + 27, y + 58 + i * 12, anchor="center")
 
 
 # ======================================================================= #
@@ -168,13 +168,13 @@ class TaskPopup:
     POP_Y = (SCREEN_HEIGHT - POP_H) // 2
 
     def __init__(self) -> None:
-        self._input:    str   = ""
-        self._result:   str   = ""    
-        self._result_t: float = 0.0   
+        self.reset()
 
     def reset(self) -> None:
-        self._input  = ""
+        self._input = ""
         self._result = ""
+        self._correct_ans = ""
+        self._result_t = 0.0
 
     @property
     def input_text(self) -> str:
@@ -192,9 +192,10 @@ class TaskPopup:
                 self._input += event.unicode
         return ""
 
-    def show_result(self, kind: str) -> None:
-        self._result   = kind
-        self._result_t = 1.6
+    def show_result(self, kind: str, correct_ans: str = "") -> None:
+        self._result = kind
+        self._correct_ans = correct_ans
+        self._result_t = 2.0  
 
     def update(self, dt: float) -> bool:
         if self._result and self._result_t > 0:
@@ -252,7 +253,12 @@ class TaskPopup:
         if self._result == "correct": txt, color = TXT_CORRECT, C_CORRECT
         elif self._result == "wrong": txt, color = TXT_WRONG_ANS, C_WRONG
         else: txt, color = TXT_TIMEOUT, C_WRONG
-        draw_text(surface, txt, FS_LARGE, color, SCREEN_WIDTH // 2, self.POP_Y + 196, anchor="center")
+        
+        y_off = self.POP_Y + 185
+        draw_text(surface, txt, FS_LARGE, color, SCREEN_WIDTH // 2, y_off, anchor="center")
+
+        if self._result in ("wrong", "timeout") and self._correct_ans:
+            draw_text(surface, f"Pareizā atbilde: {self._correct_ans}", FS_MED, C_GOLD, SCREEN_WIDTH // 2, y_off + 35, anchor="center")
 
 
 # ======================================================================= #
@@ -281,12 +287,16 @@ class ResultScreen:
         cx, y = SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 60
 
         if won:
-            if level_num < max_level:
-                self._buttons["next"] = Button(cx - 140, y, 220, 52, TXT_NEXT_LVL)
-            self._buttons["menu"] = Button(cx + (0 if level_num >= max_level else 140), y, 180, 52, TXT_MENU)
+            if level_num < max_level: 
+                self._buttons["retry"] = Button(cx - 220, y, 160, 52, TXT_REPLAY)
+                self._buttons["next"]  = Button(cx,       y, 220, 52, TXT_NEXT_LVL)
+                self._buttons["menu"]  = Button(cx + 220, y, 160, 52, TXT_MENU)
+            else:
+                self._buttons["retry"] = Button(cx - 120, y, 160, 52, TXT_REPLAY)
+                self._buttons["menu"]  = Button(cx + 120, y, 160, 52, TXT_MENU)
         else:
-            self._buttons["retry"] = Button(cx - 140, y, 200, 52, TXT_RETRY)
-            self._buttons["menu"]  = Button(cx + 140, y, 180, 52, TXT_MENU)
+            self._buttons["retry"] = Button(cx - 120, y, 200, 52, TXT_RETRY)
+            self._buttons["menu"]  = Button(cx + 120, y, 180, 52, TXT_MENU)
 
     def handle_event(self, event: pygame.event.Event) -> str:
         for key, btn in self._buttons.items():
@@ -316,10 +326,10 @@ class ResultScreen:
 
 class MainMenu:
     def __init__(self) -> None:
-        cx, cy = SCREEN_WIDTH  // 2, SCREEN_HEIGHT // 2
+        cx, cy = SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2
         self._buttons = {
-            "play": Button(cx, cy + 20,  240, 58, TXT_PLAY,  FS_LARGE),
-            "exit": Button(cx, cy + 100, 240, 58, TXT_EXIT,  FS_LARGE),
+            "play": Button(cx, cy + 20, 240, 58, TXT_PLAY, FS_LARGE),
+            "exit": Button(cx, cy + 100, 240, 58, TXT_EXIT, FS_LARGE),
         }
         self._anim = 0.0
 
@@ -358,13 +368,11 @@ class LevelSelectMenu:
         self._selected: int | None = None
         self._hovered:  int | None = None
 
-        # Aprēķina sākuma pozīciju, lai centrētu režģi
         grid_w = self.COLS * self.BTN_W + (self.COLS - 1) * self.GAP_X
         grid_h = self.ROWS * self.BTN_H + (self.ROWS - 1) * self.GAP_Y
         self._ox = (SCREEN_WIDTH  - grid_w) // 2
         self._oy = (SCREEN_HEIGHT - grid_h) // 2 + 10
 
-        # Startēšanas un atpakaļ pogas
         self._start_btn = Button(SCREEN_WIDTH // 2, self._oy + grid_h + 55, 240, 55, TXT_START, FS_LARGE)
         self._back_btn  = Button(70, 36, 120, 40, TXT_BACK, FS_SMALL)
 
@@ -373,7 +381,6 @@ class LevelSelectMenu:
         return self._selected
 
     def _get_cell_rect(self, level: int) -> pygame.Rect:
-        """Atgriež režģa šūnas taisnstūri norādītajam līmenim."""
         idx  = level - 1
         col  = idx % self.COLS
         row  = idx // self.COLS
@@ -382,7 +389,6 @@ class LevelSelectMenu:
         return pygame.Rect(x, y, self.BTN_W, self.BTN_H)
 
     def handle_event(self, event: pygame.event.Event) -> str:
-        """Atgriež 'start', 'back' vai ''."""
         if event.type == pygame.MOUSEMOTION:
             self._hovered = None
             for lvl in range(1, self._total + 1):
@@ -412,28 +418,26 @@ class LevelSelectMenu:
             selected  = lvl == self._selected
             hovered   = lvl == self._hovered and unlocked
 
-            # Aizmugure
             if selected: bg = C_BTN_HOV
             elif hovered: bg = (35, 80, 160)
             elif unlocked: bg = C_BTN
             else: bg = (25, 25, 40)
             pygame.draw.rect(surface, bg, rect, border_radius=14)
 
-            # Apmale
             bdr = C_GOLD if selected else (C_SHIP_ACCENT if unlocked else (50, 50, 70))
             pygame.draw.rect(surface, bdr, rect, 2 if not selected else 3, border_radius=14)
 
             if unlocked:
-                # Numurs un pabeigšanas atzīme
                 draw_text(surface, str(lvl), FS_LARGE, C_WHITE, rect.centerx, rect.centery - 10, anchor="center")
                 if completed:
-                    draw_text(surface, "OK", FS_MED, C_GOLD, rect.centerx, rect.centery + 18, anchor="center")
+                    # MAKSIMĀLISMS: Zīmējam skaistu ķeksīti GĀRFIKĀ, lai nav kvadrātu bugi!
+                    cx, cy = rect.centerx, rect.centery + 18
+                    pts = [(cx - 8, cy - 2), (cx - 2, cy + 6), (cx + 10, cy - 8)]
+                    pygame.draw.lines(surface, C_GOLD, False, pts, 4)
             else:
-                # Bloķēts
                 draw_text(surface, str(lvl), FS_MED, (60, 60, 80), rect.centerx, rect.centery - 10, anchor="center")
                 draw_text(surface, TXT_LOCKED, FS_SMALL, (60, 60, 80), rect.centerx, rect.centery + 16, anchor="center")
 
-        # Startēšanas poga (tikai ja izvēlēts)
         if self._selected is not None:
             self._start_btn.draw(surface)
 

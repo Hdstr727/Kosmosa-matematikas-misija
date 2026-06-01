@@ -69,7 +69,6 @@ class GameSession:
             dt = min(self._clock.tick(FPS) / 1000.0, 0.05)
             self._handle_events()
             
-            # Trīcēšana samazinās vienmēr, pat pauzes laikā
             if self._shake_timer > 0: 
                 self._shake_timer -= dt
 
@@ -84,25 +83,22 @@ class GameSession:
     def _handle_events(self) -> None:
         for event in pygame.event.get():
             if event.type == pygame.QUIT: raise SystemExit
-            # MAKSIMĀLISMS: Resize / Fullscreen apstrāde
             if self._app.handle_video_event(event): continue
 
             if self._paused and self._active_task:
                 if self._popup.handle_key(event) == "submit":
                     self._submit_answer()
             
-            # Pēdējā iespēja [E]
             if event.type == pygame.KEYDOWN and event.key == pygame.K_e:
                 if self._ship.is_out_of_fuel and not self._ship.emergency_used:
                     self._start_emergency_task()
 
     def _update(self, dt: float) -> None:
-        # Lidojuma ātruma debufs
         current_scroll = self._scroll_speed
         if self._ship.is_out_of_fuel:
-            current_scroll = 0.0 # Apstājas pilnībā!
+            current_scroll = 0.0 
         elif self._ship.fuel < LOW_FUEL_THRESHOLD:
-            current_scroll = self._scroll_speed * 0.6 # Lido lēnāk
+            current_scroll = self._scroll_speed * 0.6 
             
         self._cam_offset_y -= current_scroll * dt
         self._ship._y = self._cam_offset_y + SHIP_SCREEN_Y
@@ -141,7 +137,9 @@ class GameSession:
         if self._active_task is None: return
         self._task_time -= dt
         if self._task_time <= 0 and self._popup._result == "":
-            self._popup.show_result("timeout")
+            ans = self._active_task.answer
+            ans_str = str(int(ans)) if float(ans).is_integer() else str(ans)
+            self._popup.show_result("timeout", ans_str)
             self._handle_timeout()
         if self._popup.update(dt): self._close_popup()
 
@@ -163,19 +161,21 @@ class GameSession:
     def _submit_answer(self) -> None:
         if self._active_task is None: return
         correct = self._active_task.check(self._popup.input_text)
+        ans = self._active_task.answer
+        ans_str = str(int(ans)) if float(ans).is_integer() else str(ans)
 
         if self._emergency_popup:
             if correct: self._ship.add_fuel(EMERGENCY_FUEL_AMOUNT)
             self._ship.emergency_used = True
             self._emergency_popup = False
-            self._popup.show_result("correct" if correct else "wrong")
+            self._popup.show_result("correct" if correct else "wrong", "" if correct else ans_str)
             return
 
         if correct:
             self._popup.show_result("correct")
             if self._is_breakdown: self._ship.start_fuel_saving()
         else:
-            self._popup.show_result("wrong")
+            self._popup.show_result("wrong", ans_str)
             self._handle_wrong_answer()
 
     def _handle_wrong_answer(self) -> None:
@@ -216,7 +216,6 @@ class GameSession:
             self._result, self._lose_reason, self._done = "lose", TXT_NO_HEALTH, True
         elif self._strikes >= MAX_STRIKES:
             self._result, self._lose_reason, self._done = "lose", TXT_3_STRIKES, True
-        # Ja degviela ir 0 UN emergency ir izmantota, tad zaudejums
         elif self._ship.is_out_of_fuel and self._ship.emergency_used:
             self._result, self._lose_reason, self._done = "lose", TXT_OUT_FUEL, True
 
@@ -240,10 +239,9 @@ class GameSession:
         progress_ratio = max(0.0, min(1.0, (self._world_height - self._cam_offset_y) / self._world_height))
         self._hud.draw(render_surf, self._ship.health, SHIP_MAX_HEALTH, self._ship.fuel, SHIP_MAX_FUEL, self._strikes, MAX_STRIKES, not self._ship.emergency_used, progress_ratio)
 
-        # Uzraksts mirgo, ja degviela 0
         if self._ship.is_out_of_fuel and not self._ship.emergency_used:
             pulse = 155 + int(100 * math.sin(pygame.time.get_ticks() / 150))
-            draw_text(render_surf, "Nospied [E] arkartas degvielai!", FS_MED, (pulse, pulse, 20), SCREEN_WIDTH // 2, SCREEN_HEIGHT - 90, anchor="center")
+            draw_text(render_surf, "Nospied [E] ārkārtas degvielai!", FS_MED, (pulse, pulse, 20), SCREEN_WIDTH // 2, SCREEN_HEIGHT - 90, anchor="center")
 
         if self._paused and self._active_task:
             self._popup.draw(render_surf, self._active_task.question, self._task_time, self._task_max, self._is_breakdown)
