@@ -1,6 +1,5 @@
 """
 Kosmosa Matemātikas Misija - Spēles Konstantes
-Šis fails satur visas spēles nemainīgās vērtības.
 """
 
 SCREEN_WIDTH  = 960
@@ -9,27 +8,27 @@ FPS           = 60
 WINDOW_TITLE  = "Kosmosa Matemātikas Misija"
 
 SHIP_SCREEN_X = SCREEN_WIDTH  // 2
-SHIP_SCREEN_Y = int(SCREEN_HEIGHT * 0.8) # Kuģis atrodas nedaudz zemāk ekrānā
+SHIP_SCREEN_Y = int(SCREEN_HEIGHT * 0.8)
 
 SHIP_WIDTH        = 60
 SHIP_HEIGHT       = 72
-SHIP_SPEED_X      = 300   # Horizontālais ātrums
+SHIP_SPEED_X      = 350   
 SHIP_MAX_HEALTH   = 100
 SHIP_MAX_FUEL     = 100
-SHIP_FUEL_DRAIN   = 1.1   
+SHIP_FUEL_DRAIN   = 3.5   # Degviela beidzas ātrāk
+LOW_FUEL_THRESHOLD= 30.0  # Ja degviela < 30%, kuģis paliek lēns
 SHIP_BOUNCE_SPEED = 280   
 SHIP_BOUNCE_TIME  = 0.35  
 
 ASTEROID_MIN_RADIUS = 15
 ASTEROID_MAX_RADIUS = 45
-
 ASTEROID_DMG_SMALL  = 10
 ASTEROID_DMG_MEDIUM = 20
 ASTEROID_DMG_LARGE  = 30
 
 PICKUP_RADIUS          = 20
 HEALTH_PICKUP_VALUE    = 25
-FUEL_PICKUP_VALUE      = 30
+FUEL_PICKUP_VALUE      = 35
 PICKUP_FLOAT_AMPLITUDE = 4.0  
 PICKUP_FLOAT_SPEED     = 2.0  
 
@@ -95,34 +94,35 @@ C_WRONG       = (220, 40,  40)
 C_HEALTH_PICK = (0,   220, 80)
 C_FUEL_PICK   = (220, 100, 20)
 
-TXT_TITLE         = "Kosmosa Matemātikas Misija"
-TXT_PLAY          = "Spēlēt"
+# TEKSTI 
+TXT_TITLE         = "Kosmosa Matematikas Misija"
+TXT_PLAY          = "Spelet"
 TXT_EXIT          = "Iziet"
-TXT_CHOOSE_LEVEL  = "Izvēlies Līmeni"
-TXT_LOCKED        = "Slēgts"
-TXT_START         = "SĀKT SPĒLI!"
-TXT_HEALTH        = "VESELĪBA"
+TXT_CHOOSE_LEVEL  = "Izvelies Limeni"
+TXT_LOCKED        = "Slegts"
+TXT_START         = "SAKT SPELI!"
+TXT_HEALTH        = "VESELIBA"
 TXT_FUEL          = "DEGVIELA"
-TXT_FINISH        = "F I N I Š S"
-TXT_STRIKES       = "Kļūdas:"
-TXT_MATH_TASK     = "⚡  MATEMĀTIKAS UZDEVUMS  ⚡"
-TXT_BREAKDOWN     = "🔧  DZINĒJA BOJĀJUMS  🔧"
+TXT_FINISH        = "F I N I S S"
+TXT_STRIKES       = "Kludas:"
+TXT_MATH_TASK     = "MATEMATIKAS UZDEVUMS"
+TXT_BREAKDOWN     = "DZINEJA BOJAJUMS"
 TXT_ANSWER        = "Atbilde:"
-TXT_CONFIRM       = "Nospied ENTER lai apstiprinātu"
-TXT_CORRECT       = "✓ Pareizi!"
-TXT_WRONG_ANS     = "✗ Nepareizi!"
-TXT_TIMEOUT       = "✗ Laiks beidzies!"
-TXT_WIN_TITLE     = "LĪMENIS PABEIGTS!"
-TXT_LOSE_TITLE    = "SPĒLE BEIGUSIES"
-TXT_NEXT_LVL      = "Nākamais Līmenis"
-TXT_REPLAY        = "Atkārtot"
-TXT_MENU          = "Uz Izvēlni"
-TXT_RETRY         = "Mēģināt Vēlreiz"
-TXT_EMERG_FUEL    = "ĀRKĀRTAS\nDEGVIELA"
-TXT_OUT_FUEL      = "Degviela beigusies — pēdējā iespēja!"
-TXT_3_STRIKES     = "3 kļūdas — misija neizdevās!"
-TXT_NO_HEALTH     = "Veselība = 0 — kuģis sagrauts!"
-TXT_BACK          = "Atpakaļ"
+TXT_CONFIRM       = "Nospied ENTER lai apstiprinatu"
+TXT_CORRECT       = "Pareizi!"
+TXT_WRONG_ANS     = "Nepareizi!"
+TXT_TIMEOUT       = "Laiks beidzies!"
+TXT_WIN_TITLE     = "LIMENIS PABEIGTS!"
+TXT_LOSE_TITLE    = "SPELE BEIGUSIES"
+TXT_NEXT_LVL      = "Nakamais Limenis"
+TXT_REPLAY        = "Atkartot"
+TXT_MENU          = "Uz Izvelni"
+TXT_RETRY         = "Meginat Velreiz"
+TXT_EMERG_FUEL    = "ARKARTAS\nDEGVIELA"
+TXT_OUT_FUEL      = "Degviela beigusies - pedeja iespeja izmantota!"
+TXT_3_STRIKES     = "3 kludas - misija neizdevas!"
+TXT_NO_HEALTH     = "Veseliba = 0 - kugis sagrauts!"
+TXT_BACK          = "Atpakal"
 
 FS_SMALL  = 16
 FS_MED    = 22

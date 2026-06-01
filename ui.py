@@ -25,7 +25,8 @@ def get_font(size: int) -> pygame.font.Font:
     """Atgriež kešotu fontu norādītā izmērā."""
     if size not in _font_cache:
         try:
-            _font_cache[size] = pygame.font.SysFont("segoeui", size)
+            # Izmantojam Arial, jo tas ir uz visām OS un atbalsta latviešu burtus
+            _font_cache[size] = pygame.font.SysFont("arial", size, bold=True)
         except Exception:
             _font_cache[size] = pygame.font.Font(None, size)
     return _font_cache[size]
@@ -82,7 +83,7 @@ class Button:
 
 
 # ======================================================================= #
-#  HUD — galvas augšējais displejs
+#  HUD - galvas augšējais displejs
 # ======================================================================= #
 
 class HUD:
@@ -426,7 +427,7 @@ class LevelSelectMenu:
                 # Numurs un pabeigšanas atzīme
                 draw_text(surface, str(lvl), FS_LARGE, C_WHITE, rect.centerx, rect.centery - 10, anchor="center")
                 if completed:
-                    draw_text(surface, "✓", FS_MED, C_GOLD, rect.centerx, rect.centery + 18, anchor="center")
+                    draw_text(surface, "OK", FS_MED, C_GOLD, rect.centerx, rect.centery + 18, anchor="center")
             else:
                 # Bloķēts
                 draw_text(surface, str(lvl), FS_MED, (60, 60, 80), rect.centerx, rect.centery - 10, anchor="center")

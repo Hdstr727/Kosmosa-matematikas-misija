@@ -3,11 +3,11 @@ Matemātikas uzdevumu ģenerators / Math task generator
 
 Ģenerē uzdevumus atkarībā no grūtības pakāpes (1-5).
 Grūtības pakāpes:
-  1 — saskaitīšana, atņemšana, reizināšana (līdz 20)
-  2 — dalīšana, procenti, viegli vienādojumi
-  3 — daudzciparu darbības, dažādas darbības, dažādas daļskaitļi
-  4 — vienādojumi ar nezināmo, procentu uzdevumi
-  5 — sarežģīti vienādojumi, daļskaitļi, daudzsoļu uzdevumi
+  1 - saskaitīšana, atņemšana, reizināšana (līdz 20)
+  2 - dalīšana, procenti, viegli vienādojumi
+  3 - daudzciparu darbības, dažādas darbības, dažādas daļskaitļi
+  4 - vienādojumi ar nezināmo, procentu uzdevumi
+  5 - sarežģīti vienādojumi, daļskaitļi, daudzsoļu uzdevumi
 """
 
 from __future__ import annotations
@@ -57,7 +57,7 @@ class MathTask:
 # ======================================================================= #
 
 def _d1() -> MathTask:
-    """Grūtība 1 — vienkāršas darbības ar maziem skaitļiem."""
+    """Grūtība 1 - vienkāršas darbības ar maziem skaitļiem."""
     op = random.choice(["+", "-", "*"])
     if op == "+":
         a, b = random.randint(1, 20), random.randint(1, 20)
@@ -72,7 +72,7 @@ def _d1() -> MathTask:
 
 
 def _d2() -> MathTask:
-    """Grūtība 2 — dalīšana, procenti, vienkārši vienādojumi."""
+    """Grūtība 2 - dalīšana, procenti, vienkārši vienādojumi."""
     kind = random.choice(["div", "pct", "eq"])
     if kind == "div":
         b = random.randint(2, 12)
@@ -92,7 +92,7 @@ def _d2() -> MathTask:
 
 
 def _d3() -> MathTask:
-    """Grūtība 3 — lielāki skaitļi, daļskaitļi, jauktas darbības."""
+    """Grūtība 3 - lielāki skaitļi, daļskaitļi, jauktas darbības."""
     kind = random.choice(["big", "frac", "mixed"])
     if kind == "big":
         op = random.choice(["+", "-", "*"])
@@ -120,7 +120,7 @@ def _d3() -> MathTask:
 
 
 def _d4() -> MathTask:
-    """Grūtība 4 — vienādojumi, procentu uzdevumi."""
+    """Grūtība 4 - vienādojumi, procentu uzdevumi."""
     kind = random.choice(["eq2", "pct2", "power"])
     if kind == "eq2":
         x = random.randint(2, 15)
@@ -141,7 +141,7 @@ def _d4() -> MathTask:
 
 
 def _d5() -> MathTask:
-    """Grūtība 5 — sarežģīti vienādojumi, daudzsoļu uzdevumi."""
+    """Grūtība 5 - sarežģīti vienādojumi, daudzsoļu uzdevumi."""
     kind = random.choice(["eq3", "frac2", "combined"])
     if kind == "eq3":
         x = random.randint(1, 12)

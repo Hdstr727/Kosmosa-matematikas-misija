@@ -17,9 +17,9 @@ from constants         import *
 
 
 class GameSession:
-    def __init__(self, screen: pygame.Surface, clock: pygame.time.Clock, cfg: dict) -> None:
-        self._screen = screen
-        self._clock  = clock
+    def __init__(self, app, cfg: dict) -> None:
+        self._app    = app # Piekļuve galvenajam App (main.py)
+        self._clock  = app._clock
         self._cfg    = cfg
 
         self._ship       = Ship()
@@ -30,7 +30,6 @@ class GameSession:
         self._scroll_speed:  float = float(cfg["scroll_speed"])
         self._cam_offset_y:  float = float(cfg["world_height"]) 
 
-        # Kuģa pasaules Y = kameras nobīde + ekrāna Y
         self._ship._y = self._cam_offset_y + SHIP_SCREEN_Y
 
         self._bg         = Background()
@@ -45,7 +44,7 @@ class GameSession:
         self._lose_reason:  str   = ""
 
         self._hit_cooldown: float = 0.0
-        self._shake_timer:  float = 0.0  # EKRĀNA TRĪCĒŠANAI
+        self._shake_timer:  float = 0.0 
 
         self._math_timer:    float = random.uniform(*cfg["math_interval"])
         self._active_task:   MathTask | None = None
@@ -69,58 +68,65 @@ class GameSession:
         while not self._done:
             dt = min(self._clock.tick(FPS) / 1000.0, 0.05)
             self._handle_events()
+            
+            # Trīcēšana samazinās vienmēr, pat pauzes laikā
+            if self._shake_timer > 0: 
+                self._shake_timer -= dt
+
             if not self._paused:
                 self._update(dt)
             else:
                 self._update_popup(dt)
+                
             self._draw()
         return {"result": self._result, "reason": self._lose_reason}
 
     def _handle_events(self) -> None:
         for event in pygame.event.get():
             if event.type == pygame.QUIT: raise SystemExit
+            # MAKSIMĀLISMS: Resize / Fullscreen apstrāde
+            if self._app.handle_video_event(event): continue
+
             if self._paused and self._active_task:
                 if self._popup.handle_key(event) == "submit":
                     self._submit_answer()
+            
+            # Pēdējā iespēja [E]
             if event.type == pygame.KEYDOWN and event.key == pygame.K_e:
                 if self._ship.is_out_of_fuel and not self._ship.emergency_used:
                     self._start_emergency_task()
 
     def _update(self, dt: float) -> None:
-        self._cam_offset_y -= self._scroll_speed * dt
+        # Lidojuma ātruma debufs
+        current_scroll = self._scroll_speed
+        if self._ship.is_out_of_fuel:
+            current_scroll = 0.0 # Apstājas pilnībā!
+        elif self._ship.fuel < LOW_FUEL_THRESHOLD:
+            current_scroll = self._scroll_speed * 0.6 # Lido lēnāk
+            
+        self._cam_offset_y -= current_scroll * dt
         self._ship._y = self._cam_offset_y + SHIP_SCREEN_Y
 
-        # UZVARAS NOSACĪJUMS SALABOTS! Kuģis sasniedz Y=0
         if self._ship._y <= 0:
-            self._result = "win"
-            self._done   = True
+            self._result, self._done = "win", True
             return
 
         self._ship.update(dt)
-        
-        # Pievieno dzinēja partikulas lidojumam (trail)
-        self._particles.spawn_trail(self._ship.screen_x, SHIP_SCREEN_Y + SHIP_HEIGHT//2, C_FLAME_OUT)
+        if not self._ship.is_out_of_fuel:
+            self._particles.spawn_trail(self._ship.screen_x, SHIP_SCREEN_Y + SHIP_HEIGHT//2, C_FLAME_OUT)
 
-        # Dinamiska asteroīdu ģenerēšana!
         while len(self._asteroids) < self._cfg["asteroid_count"]:
-            x = random.randint(50, SCREEN_WIDTH - 50)
-            wy = self._cam_offset_y - random.randint(100, 400) # Virs ekrāna
-            self._asteroids.append(Asteroid(x, wy, self._cfg["asteroid_speed"]/100.0))
+            self._asteroids.append(Asteroid(random.randint(50, SCREEN_WIDTH - 50), self._cam_offset_y - random.randint(100, 400), self._cfg["asteroid_speed"]/100.0))
 
-        # Attīra asteroīdus, kas nokrituši garām
         for a in self._asteroids[:]:
             a.update(dt)
-            if a.screen_y(self._cam_offset_y) > SCREEN_HEIGHT + 150:
-                self._asteroids.remove(a)
+            if a.screen_y(self._cam_offset_y) > SCREEN_HEIGHT + 150: self._asteroids.remove(a)
 
         for p in self._pickups: p.update(dt)
         self._particles.update()
 
         if self._hit_cooldown > 0: self._hit_cooldown -= dt
         else: self._check_asteroid_collisions()
-        
-        if self._shake_timer > 0: self._shake_timer -= dt
-
         self._check_pickup_collisions()
 
         self._math_timer -= dt
@@ -141,21 +147,17 @@ class GameSession:
 
     def _start_math_task(self, breakdown: bool = False) -> None:
         self._active_task  = generate_task(self._cfg["difficulty"])
-        self._task_time    = float(self._cfg["math_time"])
-        self._task_max     = float(self._cfg["math_time"])
-        self._is_breakdown = breakdown
-        self._paused       = True
+        self._task_time = self._task_max = float(self._cfg["math_time"])
+        self._is_breakdown, self._paused = breakdown, True
         self._popup.reset()
         if breakdown: self._breakdown_timer = random.uniform(*self._cfg["breakdown_interval"])
         else: self._math_timer = random.uniform(*self._cfg["math_interval"])
 
     def _start_emergency_task(self) -> None:
         self._active_task  = generate_task(min(5, self._cfg["difficulty"] + 2))
-        self._task_time    = 20.0
-        self._task_max     = 20.0
+        self._task_time = self._task_max = 20.0
         self._is_breakdown = False
-        self._emergency_popup = True
-        self._paused       = True
+        self._emergency_popup, self._paused = True, True
         self._popup.reset()
 
     def _submit_answer(self) -> None:
@@ -185,20 +187,15 @@ class GameSession:
     def _handle_timeout(self) -> None: self._handle_wrong_answer()
 
     def _close_popup(self) -> None:
-        self._active_task = None
-        self._paused      = False
+        self._active_task, self._paused = None, False
         self._popup.reset()
 
     def _check_asteroid_collisions(self) -> None:
         ship_rect = self._ship.get_rect()
         for ast in self._asteroids:
             if not ship_rect.colliderect(ast.get_screen_rect(self._cam_offset_y)): continue
-            
-            # MAKSIMĀLISMS: Ekrāna trīcēšana un skaistākas partikulas
-            self._shake_timer = 0.4
+            self._shake_timer, self._hit_cooldown = 0.4, 1.0   
             self._ship.take_damage(ast.damage_amount)
-            self._hit_cooldown = 1.0   
-            
             dx, dy = self._ship.screen_x - ast.x, SHIP_SCREEN_Y - ast.screen_y(self._cam_offset_y)
             dist = math.hypot(dx, dy) or 1
             self._ship.bounce_away(dx / dist, dy / dist)
@@ -219,19 +216,17 @@ class GameSession:
             self._result, self._lose_reason, self._done = "lose", TXT_NO_HEALTH, True
         elif self._strikes >= MAX_STRIKES:
             self._result, self._lose_reason, self._done = "lose", TXT_3_STRIKES, True
+        # Ja degviela ir 0 UN emergency ir izmantota, tad zaudejums
         elif self._ship.is_out_of_fuel and self._ship.emergency_used:
             self._result, self._lose_reason, self._done = "lose", TXT_OUT_FUEL, True
 
     def _draw(self) -> None:
-        # Screen shake aprēķins
         sx, sy = 0, 0
         if self._shake_timer > 0:
             power = int(self._shake_timer * 20)
-            sx = random.randint(-power, power)
-            sy = random.randint(-power, power)
+            sx, sy = random.randint(-power, power), random.randint(-power, power)
 
-        # Izveidojam virsmu zīmēšanai
-        render_surf = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
+        render_surf = self._app.logical_surface
         
         self._bg.draw(render_surf, self._cam_offset_y)
         draw_finish_line(render_surf, self._cam_offset_y, self._world_height, self._scroll_speed)
@@ -242,16 +237,15 @@ class GameSession:
         self._particles.draw(render_surf)
         self._ship.draw(render_surf)
 
-        # HUD Zīmēšana (padodam progresu)
         progress_ratio = max(0.0, min(1.0, (self._world_height - self._cam_offset_y) / self._world_height))
         self._hud.draw(render_surf, self._ship.health, SHIP_MAX_HEALTH, self._ship.fuel, SHIP_MAX_FUEL, self._strikes, MAX_STRIKES, not self._ship.emergency_used, progress_ratio)
 
+        # Uzraksts mirgo, ja degviela 0
         if self._ship.is_out_of_fuel and not self._ship.emergency_used:
-            draw_text(render_surf, "Nospied [E] ārkārtas degvielai!", FS_MED, C_EMERGENCY, SCREEN_WIDTH // 2, SCREEN_HEIGHT - 90, anchor="center")
+            pulse = 155 + int(100 * math.sin(pygame.time.get_ticks() / 150))
+            draw_text(render_surf, "Nospied [E] arkartas degvielai!", FS_MED, (pulse, pulse, 20), SCREEN_WIDTH // 2, SCREEN_HEIGHT - 90, anchor="center")
 
         if self._paused and self._active_task:
             self._popup.draw(render_surf, self._active_task.question, self._task_time, self._task_max, self._is_breakdown)
 
-        # Zīmē uz īstā ekrāna ar ofsetu (Shake)
-        self._screen.blit(render_surf, (sx, sy))
-        pygame.display.flip()
+        self._app._render_and_scale(sx, sy)

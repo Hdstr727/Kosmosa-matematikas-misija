@@ -6,7 +6,7 @@ Uzlabojumu klases / Pickup classes
 - Mantošana: HealthPickup un FuelPickup manto Pickup, kas manto BaseEntity
   BaseEntity → Pickup → HealthPickup
                       → FuelPickup
-- Polimorfisms: apply(), get_particle_color(), get_label() — katrā citādas
+- Polimorfisms: apply(), get_particle_color(), get_label() - katrā citādas
 - Virtuālās funkcijas: apply() un get_particle_color() ir @abstractmethod
 """
 
@@ -34,9 +34,9 @@ class Pickup(BaseEntity):
     Manto BaseEntity, bet ir pati arī abstrakta.
 
     Apakšklases (HealthPickup, FuelPickup) OBLIGĀTI ievieš:
-      - apply(ship)           — piemēro efektu
-      - get_particle_color()  — partikulu krāsa efektam
-      - get_label()           — uzraksts (diagnostikai)
+      - apply(ship)           - piemēro efektu
+      - get_particle_color()  - partikulu krāsa efektam
+      - get_label()           - uzraksts (diagnostikai)
     """
 
     def __init__(self, world_x: float, world_y: float) -> None:
@@ -85,7 +85,7 @@ class Pickup(BaseEntity):
         return self._collected
 
     # ------------------------------------------------------------------ #
-    #  Virtuālā funkcija: update() — peldēšanas animācija
+    #  Virtuālā funkcija: update() - peldēšanas animācija
     # ------------------------------------------------------------------ #
 
     def update(self, dt: float) -> None:
@@ -107,7 +107,7 @@ class Pickup(BaseEntity):
     # ------------------------------------------------------------------ #
 
     def get_rect(self) -> pygame.Rect:
-        """[Pārraksta BaseEntity.get_rect()] — pasaules koordinātas."""
+        """[Pārraksta BaseEntity.get_rect()] - pasaules koordinātas."""
         return pygame.Rect(
             int(self._x) - PICKUP_RADIUS,
             int(self._y) - PICKUP_RADIUS,
@@ -129,7 +129,7 @@ class Pickup(BaseEntity):
 
 class HealthPickup(Pickup):
     """
-    Zaļš krustveida uzlabojums — atjauno kuģa veselību.
+    Zaļš krustveida uzlabojums - atjauno kuģa veselību.
 
     === Mantošana ===
     BaseEntity → Pickup → HealthPickup
@@ -195,13 +195,13 @@ class HealthPickup(Pickup):
 
 class FuelPickup(Pickup):
     """
-    Sarkana kanistra ikona — papildina degvielu.
+    Sarkana kanistra ikona - papildina degvielu.
 
     === Mantošana ===
     BaseEntity → Pickup → FuelPickup
 
     === Polimorfisms ===
-    Pārraksta apply() un get_particle_color() — atšķirīga uzvedība.
+    Pārraksta apply() un get_particle_color() - atšķirīga uzvedība.
     """
 
     def __init__(self, world_x: float, world_y: float) -> None:

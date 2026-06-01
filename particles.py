@@ -14,7 +14,7 @@ import pygame
 
 class Particle:
     """
-    Viena partikula — vizuāls efekts sadursmei vai savākšanai.
+    Viena partikula - vizuāls efekts sadursmei vai savākšanai.
     """
     def __init__(self, x: float, y: float, color: tuple,
                  vx: float, vy: float, lifetime: int, size: int = 4) -> None:

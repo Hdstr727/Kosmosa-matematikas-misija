@@ -66,9 +66,16 @@ class Ship(BaseEntity):
             factor = self._bounce_time / SHIP_BOUNCE_TIME
             self._x += self._bounce_vx * factor * dt
         else:
+            # Ātruma debufi atkarībā no degvielas
+            current_speed = SHIP_SPEED_X
+            if self.is_out_of_fuel:
+                current_speed = 0.0 # Apstājas pilnībā, ja nav degvielas!
+            elif self.fuel < LOW_FUEL_THRESHOLD:
+                current_speed = SHIP_SPEED_X * 0.5 # Paliek lēns, ja maz degvielas
+                
             keys = pygame.key.get_pressed()
-            if keys[pygame.K_LEFT]: self._x -= SHIP_SPEED_X * dt
-            if keys[pygame.K_RIGHT]: self._x += SHIP_SPEED_X * dt
+            if keys[pygame.K_LEFT]: self._x -= current_speed * dt
+            if keys[pygame.K_RIGHT]: self._x += current_speed * dt
             
         # Ierobežo ekrānā
         self._x = max(SHIP_WIDTH // 2, min(SCREEN_WIDTH - SHIP_WIDTH // 2, self._x))
@@ -86,6 +93,11 @@ class Ship(BaseEntity):
 
     def _draw_flames(self, s, cx, cy, w, h) -> None:
         pulse = 0.7 + 0.3 * math.sin(self._anim_time * 12)
+        # Ja beigusies degviela, liesmu nav!
+        if self.is_out_of_fuel: return
+        # Ja maz degvielas, liesmas ir mazas
+        if self.fuel < LOW_FUEL_THRESHOLD: pulse *= 0.5
+        
         self._draw_single_flame(s, cx - w // 5, cy + h // 2 - 2, pulse)
         self._draw_single_flame(s, cx + w // 5, cy + h // 2 - 2, pulse)
         self._draw_single_flame(s, cx, cy + h // 2, pulse, scale=1.3)
@@ -117,6 +129,8 @@ class Ship(BaseEntity):
         pygame.draw.ellipse(s, C_COCKPIT_L, pygame.Rect(cab_rect.x + 3, cab_rect.y + 2, cab_w - 10, cab_h - 6))
 
     def _draw_engine_glow(self, s, cx, cy, w, h) -> None:
+        # Nav gaismas, ja nav degvielas
+        if self.is_out_of_fuel: return
         pulse = 0.8 + 0.2 * math.sin(self._anim_time * 8)
         glow_color = (int(C_ENGINE[0] * pulse), int(C_ENGINE[1] * pulse), int(C_ENGINE[2] * pulse))
         pygame.draw.rect(s, glow_color, pygame.Rect(cx - 6, cy + h // 2 - 6, 12, 10), border_radius=3)

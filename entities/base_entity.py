@@ -4,7 +4,7 @@ Bāzes entitātes abstraktā klase / Base entity abstract class
 === OOP Koncepti / OOP Concepts ===
 - Abstraktā klase (ABC): BaseEntity nevar tieši instancēt
 - Virtuālās funkcijas (@abstractmethod): update(), draw(), get_rect()
-  — katra apakšklase OBLIGĀTI pārraksta šīs metodes
+  - katra apakšklase OBLIGĀTI pārraksta šīs metodes
 - Iekapsulesana: stāvoklis glabāts _privātos atribūtos
 - Datu slēpsana: piekļuve caur property dekoratoriem
 """
@@ -25,14 +25,14 @@ class BaseEntity(ABC):
       BaseEntity
         ├── Ship          (kuģis)
         ├── Asteroid      (asteroīds)
-        └── Pickup        (uzlabojumi — arī abstrakts)
+        └── Pickup        (uzlabojumi - arī abstrakts)
               ├── HealthPickup
               └── FuelPickup
 
     Virtuālās funkcijas, ko apakšklases PĀRRAKSTA:
-      - update(dt)         — atjaunina stāvokli
-      - draw(screen, ...)  — zīmē objektu
-      - get_rect()         — atgriež sadursmes taisnstūri
+      - update(dt)         - atjaunina stāvokli
+      - draw(screen, ...)  - zīmē objektu
+      - get_rect()         - atgriež sadursmes taisnstūri
     """
 
     def __init__(self, x: float, y: float) -> None:
@@ -65,7 +65,7 @@ class BaseEntity(ABC):
         [VIRTUĀLĀ FUNKCIJA] Zīmē objektu uz ekrāna.
         surface: pygame Surface (ekrāns)
         cam_offset_y: kameras nobīde pa Y asi (scrolling)
-        Katra apakšklase zīmē sevi savādāk — POLIMORFISMS.
+        Katra apakšklase zīmē sevi savādāk - POLIMORFISMS.
         """
         ...
 
@@ -107,7 +107,7 @@ class BaseEntity(ABC):
         return self._alive
 
     def destroy(self) -> None:
-        """Atzīmē objektu kā nedzīvu — to izņems no spēles."""
+        """Atzīmē objektu kā nedzīvu - to izņems no spēles."""
         self._alive = False
 
     # ------------------------------------------------------------------ #

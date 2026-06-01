@@ -21,7 +21,7 @@ class GameState:
 
     def __init__(self):
         # === Datu slēpsana (Data hiding) ===
-        # Privāti atribūti — ārējs kods nedrīkst tieši mainīt
+        # Privāti atribūti - ārējs kods nedrīkst tieši mainīt
         self._unlocked: set[int] = {1}   # 1. līmenis vienmēr atvērts
         self._completed: set[int] = set()
 
@@ -41,7 +41,7 @@ class GameState:
             self._unlocked  = set(data.get("unlocked",  [1]))
             self._completed = set(data.get("completed", []))
         except (json.JSONDecodeError, KeyError):
-            # Ja fails bojāts — sāk no sākuma
+            # Ja fails bojāts - sāk no sākuma
             self._unlocked  = {1}
             self._completed = set()
 

@@ -19,7 +19,7 @@ class StarLayer:
     Viens zvaigžņu slānis ar parallax kustību.
 
     === Iekapsulesana ===
-    Zvaigžņu pozīcijas glabātas privāti — ārējs kods tikai izsauc draw().
+    Zvaigžņu pozīcijas glabātas privāti - ārējs kods tikai izsauc draw().
     """
 
     def __init__(self, count: int, speed_factor: float,
@@ -92,7 +92,7 @@ class Background:
             y = int((base_y - cam_offset_y * 0.03) % SCREEN_HEIGHT)
             r, g, b, a = color
             neb_surf = pygame.Surface((rx * 2, ry * 2), pygame.SRCALPHA)
-            # Gradient efekts — vairāki apļi ar mazāku alpha
+            # Gradient efekts - vairāki apļi ar mazāku alpha
             for scale in [1.0, 0.7, 0.45]:
                 aa = int(a * scale * 0.6)
                 w  = int(rx * 2 * scale)
