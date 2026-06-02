@@ -275,6 +275,35 @@ def draw_finish_line(surface: pygame.Surface, cam_offset_y: float,
 
 
 # ======================================================================= #
+#  Pauzes Izvēlne / Pause Menu
+# ======================================================================= #
+
+class PauseMenu:
+    def __init__(self) -> None:
+        cx, cy = SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2
+        self._buttons = {
+            "resume": Button(cx, cy - 30, 240, 58, TXT_RESUME, FS_LARGE),
+            "quit":   Button(cx, cy + 50, 240, 58, TXT_MENU, FS_LARGE),
+        }
+
+    def handle_event(self, event: pygame.event.Event) -> str:
+        for key, btn in self._buttons.items():
+            if btn.handle_event(event): return key
+        return ""
+
+    def draw(self, surface: pygame.Surface) -> None:
+        overlay = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
+        overlay.fill((0, 0, 0, 180))
+        surface.blit(overlay, (0, 0))
+
+        cx, cy = SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2
+        draw_text(surface, TXT_PAUSED, FS_HUGE, C_GOLD, cx, cy - 130, anchor="center")
+
+        for btn in self._buttons.values():
+            btn.draw(surface)
+
+
+# ======================================================================= #
 #  Uzvaras / Zaudējuma ekrāns
 # ======================================================================= #
 
