@@ -15,8 +15,8 @@ SHIP_HEIGHT       = 72
 SHIP_SPEED_X      = 350   
 SHIP_MAX_HEALTH   = 100
 SHIP_MAX_FUEL     = 100
-SHIP_FUEL_DRAIN   = 3.5   
-LOW_FUEL_THRESHOLD= 30.0  
+SHIP_FUEL_DRAIN   = 1.9   
+LOW_FUEL_THRESHOLD= 30.0 
 SHIP_BOUNCE_SPEED = 280   
 SHIP_BOUNCE_TIME  = 0.35  
 
@@ -123,6 +123,8 @@ TXT_OUT_FUEL      = "Degviela beigusies - pēdējā iespēja izmantota!"
 TXT_3_STRIKES     = "3 kļūdas - misija neizdevās!"
 TXT_NO_HEALTH     = "Veselība = 0 - kuģis sagrauts!"
 TXT_BACK          = "Atpakaļ"
+TXT_PAUSED        = "PAUZE"
+TXT_RESUME        = "Turpināt"
 
 FS_SMALL  = 16
 FS_MED    = 22
