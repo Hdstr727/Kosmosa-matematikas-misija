@@ -12,13 +12,13 @@ from entities.pickup   import HealthPickup, FuelPickup
 from background        import Background
 from particles         import ParticleSystem
 from math_tasks        import generate_task, MathTask
-from ui                import HUD, TaskPopup, draw_finish_line, draw_text
+from ui                import HUD, TaskPopup, PauseMenu, draw_finish_line, draw_text
 from constants         import *
 
 
 class GameSession:
     def __init__(self, app, cfg: dict) -> None:
-        self._app    = app # Piekļuve galvenajam App (main.py)
+        self._app    = app 
         self._clock  = app._clock
         self._cfg    = cfg
 
@@ -36,9 +36,14 @@ class GameSession:
         self._particles  = ParticleSystem()
         self._hud        = HUD()
         self._popup      = TaskPopup()
+        self._pause_menu = PauseMenu()
 
         self._strikes:      int   = 0
-        self._paused:       bool  = False   
+        
+        # Divu veidu pauzes: viena no spēlētāja (ESC), otra - uzdevuma dēļ
+        self._user_paused:  bool  = False 
+        self._task_paused:  bool  = False   
+        
         self._done:         bool  = False
         self._result:       str   = ""      
         self._lose_reason:  str   = ""
@@ -69,10 +74,15 @@ class GameSession:
             dt = min(self._clock.tick(FPS) / 1000.0, 0.05)
             self._handle_events()
             
+            # Ja ir pauze no spēlētāja - atjaunojam tikai zīmēšanu un gaidām
+            if self._user_paused:
+                self._draw()
+                continue
+
             if self._shake_timer > 0: 
                 self._shake_timer -= dt
 
-            if not self._paused:
+            if not self._task_paused:
                 self._update(dt)
             else:
                 self._update_popup(dt)
@@ -85,7 +95,27 @@ class GameSession:
             if event.type == pygame.QUIT: raise SystemExit
             if self._app.handle_video_event(event): continue
 
-            if self._paused and self._active_task:
+            # Lai peles klikšķi pa pauzes izvēlni strādātu pareizi pēc loga izmēru maiņas
+            if event.type in (pygame.MOUSEBUTTONDOWN, pygame.MOUSEBUTTONUP, pygame.MOUSEMOTION):
+                event.pos = self._app.map_mouse_pos(event.pos)
+
+            if self._user_paused:
+                action = self._pause_menu.handle_event(event)
+                if action == "resume": 
+                    self._user_paused = False
+                elif action == "quit": 
+                    self._result, self._done = "quit", True
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                    self._user_paused = False
+                continue
+
+            # ESC nospiešana - pauzē spēli tikai tad, ja nav matemātikas uzdevuma
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                if not self._task_paused:
+                    self._user_paused = True
+                    continue
+
+            if self._task_paused and self._active_task:
                 if self._popup.handle_key(event) == "submit":
                     self._submit_answer()
             
@@ -126,10 +156,10 @@ class GameSession:
         self._check_pickup_collisions()
 
         self._math_timer -= dt
-        if self._math_timer <= 0 and not self._paused: self._start_math_task(breakdown=False)
+        if self._math_timer <= 0 and not self._task_paused: self._start_math_task(breakdown=False)
 
         self._breakdown_timer -= dt
-        if self._breakdown_timer <= 0 and not self._paused: self._start_math_task(breakdown=True)
+        if self._breakdown_timer <= 0 and not self._task_paused: self._start_math_task(breakdown=True)
 
         self._check_lose_conditions()
 
@@ -146,7 +176,7 @@ class GameSession:
     def _start_math_task(self, breakdown: bool = False) -> None:
         self._active_task  = generate_task(self._cfg["difficulty"])
         self._task_time = self._task_max = float(self._cfg["math_time"])
-        self._is_breakdown, self._paused = breakdown, True
+        self._is_breakdown, self._task_paused = breakdown, True
         self._popup.reset()
         if breakdown: self._breakdown_timer = random.uniform(*self._cfg["breakdown_interval"])
         else: self._math_timer = random.uniform(*self._cfg["math_interval"])
@@ -155,7 +185,7 @@ class GameSession:
         self._active_task  = generate_task(min(5, self._cfg["difficulty"] + 2))
         self._task_time = self._task_max = 20.0
         self._is_breakdown = False
-        self._emergency_popup, self._paused = True, True
+        self._emergency_popup, self._task_paused = True, True
         self._popup.reset()
 
     def _submit_answer(self) -> None:
@@ -187,7 +217,7 @@ class GameSession:
     def _handle_timeout(self) -> None: self._handle_wrong_answer()
 
     def _close_popup(self) -> None:
-        self._active_task, self._paused = None, False
+        self._active_task, self._task_paused = None, False
         self._popup.reset()
 
     def _check_asteroid_collisions(self) -> None:
@@ -243,7 +273,10 @@ class GameSession:
             pulse = 155 + int(100 * math.sin(pygame.time.get_ticks() / 150))
             draw_text(render_surf, "Nospied [E] ārkārtas degvielai!", FS_MED, (pulse, pulse, 20), SCREEN_WIDTH // 2, SCREEN_HEIGHT - 90, anchor="center")
 
-        if self._paused and self._active_task:
+        if self._task_paused and self._active_task:
             self._popup.draw(render_surf, self._active_task.question, self._task_time, self._task_max, self._is_breakdown)
+
+        if self._user_paused:
+            self._pause_menu.draw(render_surf)
 
         self._app._render_and_scale(sx, sy)
