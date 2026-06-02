@@ -78,6 +78,10 @@ class Game:
         session = GameSession(self, get_level_config(level))
         result  = session.run()   
 
+        # Ja spēlētājs iziet no pauzes izvēlnes atpakaļ uz galveno
+        if result["result"] == "quit":
+            return self._init_main_menu()
+
         if result["result"] == "win":
             self._save.complete_level(level)
 
